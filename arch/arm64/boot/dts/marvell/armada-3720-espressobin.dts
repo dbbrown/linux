@@ -216,3 +216,78 @@
 		full-duplex;
 	};
 };
+
+/{
+	aliases {
+		ethernet0 = "/soc/internal-regs@d0000000/ethernet@30000";
+	};
+};
+
+&pinctrl_nb {
+	mmc_pins: mmc-pins {
+		groups = "emmc_nb";
+		function = "emmc";
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		user {
+			label = "user";
+			gpios = < &gpionb 2 GPIO_ACTIVE_LOW >;
+			default-state = "off";
+		};
+	};
+
+};
+
+/* U11 */
+&sdhci0 {
+	non-removable;
+	bus-width = <8>;
+	mmc-ddr-1_8v;
+	mmc-hs400-1_8v;
+	marvell,pad-type = "fixed-1-8v";
+	pinctrl-names = "default";
+	pinctrl-0 = <&mmc_pins>;
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	mmccard: mmccard@0 {
+		compatible = "mmc-card";
+		reg = <0>;
+	};
+};
+
+&spi0 {
+	flash@0 {
+		compatible = "jedec,spi-nor";
+		partitions {
+			partition@0 {
+				reg = <0 0x3f0000>;
+			};
+
+			partition@180000 {
+				label = "do-not-use";
+				status = "disabled";
+			};
+
+			partition@3f0000 {
+				label = "uboot-env";
+				reg = <0x3f0000 0x10000>;
+			};
+		};
+	};
+};
+
+&switch0 {
+	ports {
+		port@1 {
+			label = "lan1";
+		};
+
+		port@3 {
+			label = "wan";
+		};
+	};
+};
